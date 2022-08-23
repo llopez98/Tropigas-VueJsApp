@@ -80,7 +80,22 @@
         </v-data-table>
       </v-card>
     </div>
-
+<v-alert
+v-model="alertGood"
+      dense
+      text
+      type="success"
+    >
+      Datos cargados correctamente!
+    </v-alert>
+    <v-alert
+v-model="alertBad"
+      dense
+      text
+      type="danger"
+    >
+      Error al traer los datos!
+    </v-alert>
   </v-container>
 </template>
 
@@ -90,6 +105,8 @@ export default {
   name: 'Main',
 
   data: () => ({
+    alertGood: false,
+    alertBad: false,
     cont: 1,
     cont2: 1,
     vistaArticulo: true,
@@ -164,16 +181,23 @@ export default {
       this.vistaArticulo = true;
       this.vistaEditar = false;
       this.vistaRegistro = false;
+      this.alertGood = false;
+      this.alertBad = false;
     },
     setRegistrar() {
       this.vistaArticulo = false;
       this.vistaEditar = false;
       this.vistaRegistro = true;
+      this.alertGood = false;
+      this.alertBad = false;
     },
     setEditar() {
       this.vistaArticulo = false;
       this.vistaEditar = true;
       this.vistaRegistro = false;
+      this.alertGood = false;
+      this.alertBad = false;
+      this.getVentas();
     },
     agregar() {
       this.VentaD.id = "get_articulos" + this.cont2;
@@ -188,29 +212,43 @@ export default {
       this.Venta.id = "get_articulos" + this.cont2;
       axios.post('https://appservice-webapp-tropigas.azurewebsites.net/api/Venta', this.Venta).then(function (response) {
         console.log(response);
+              this.alertGood = true;
+                getVentas();
       })
         .catch(function (error) {
           console.log(error);
+                this.alertGood = false;
+                      this.alertBad = true;
+
+
         });
       axios.post('https://appservice-webapp-tropigas.azurewebsites.net/api/VentaD', this.VentasD).then(function (response) {
         console.log(response);
+              this.alertGood = true;
+
       })
         .catch(function (error) {
           console.log(error);
+          this.alertGood = false;
+                      this.alertBad = true;
         });
       this.cont2++;
     },
     async getRoutes() {
       const { data } = await axios.get('https://appservice-webapp-tropigas.azurewebsites.net/api/Configuracion');
       this.Configuracion = data;
+      
     },
     async getArticulos() {
       const { data } = await axios.get('https://appservice-webapp-tropigas.azurewebsites.net/api/Articulos');
       this.articulos = data;
+      this.alertGood = true;
     },
     async getVentas() {
       const { data } = await axios.get('https://appservice-webapp-tropigas.azurewebsites.net/api/Venta');
       this.ventasTotales = data;
+            this.alertGood = true;
+
     },
     async deleteItem(item) {
       await axios.delete('https://appservice-webapp-tropigas.azurewebsites.net/api/Venta/' + item.id);
